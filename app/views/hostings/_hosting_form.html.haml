@@ -10,10 +10,10 @@
     .form-group
       = f.label :accomodation_type, "What kind of accomodation are you offering?"
       .multiline-radio
-        = f.label :accomodation_type_home, :display => 'inline-block' do 
+        = f.label :accomodation_type_home, :display => 'inline-block' do
           = f.radio_button :accomodation_type, 'home', :checked => true
           %span.hosting Room or bed in my home
-        = f.label :accomodation_type_home, :display => 'inline-block' do 
+        = f.label :accomodation_type_home, :display => 'inline-block' do
           = f.radio_button :accomodation_type, 'hotel'
           %span.hosting Hotel room or other accommodations
 
@@ -36,5 +36,9 @@
       = f.label :comment, "Please share any additional information about your accommodations:"
       = f.text_field :comment, class: 'form-control'
       %span.hosting e.g. number of available beds, cost per person in shared hotel room or rental house, or accessible hours.
+
+    .form-group
+      = f.label :comment, "Add photos:"
+      = cl_image_upload_tag(:image_id, cloud_name: ENV["CLOUDINARY_NAME"], api_key: ENV["CLOUDINARY_API_KEY"], api_secret: ENV["CLOUDINARY_SECRET"], multiple: true)
 
   = f.submit "Save", class: 'btn btn-success btn-block btn-lg'
