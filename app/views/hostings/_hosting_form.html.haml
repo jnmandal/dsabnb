@@ -41,6 +41,7 @@
       = label_tag :file, "Photos:"
       - @hosting.images.each do |image|
         = image_tag image.url, alt: 'thumbnail image', class: 'img-upload-thumb'
+        = hidden_field_tag "images[][url]", image.url
       = file_field_tag :file, data: { 'form-data': (@s3_direct_post.fields), url: @s3_direct_post.url, host: URI.parse(@s3_direct_post.url).host, 'field-name': 'images[][url]' }
 
   = f.submit "Save", class: 'btn btn-success btn-block btn-lg'

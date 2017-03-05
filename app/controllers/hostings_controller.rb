@@ -24,7 +24,7 @@ class HostingsController < ApplicationController
   end
 
   def update
-    @images = image_params[:images].map { |i| Image.find_or_create_by(id: i[:id], url: i[:url]) }
+    @images = image_params[:images].map { |i| Image.find_or_create_by(url: i[:url]) }
     @hosting.images = @images
 
     if @hosting.update(hosting_params)
@@ -64,7 +64,7 @@ class HostingsController < ApplicationController
   end
 
   def image_params
-    params.permit(images: [:url, :id])
+    params.permit(images: [:url])
   end
 
   def find_hosting
