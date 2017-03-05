@@ -37,8 +37,70 @@
       = f.text_field :comment, class: 'form-control'
       %span.hosting e.g. number of available beds, cost per person in shared hotel room or rental house, or accessible hours.
 
-    .form-group
-      = f.label :comment, "Add photos:"
-      = cl_image_upload_tag(:image_id, cloud_name: ENV["CLOUDINARY_NAME"], api_key: ENV["CLOUDINARY_API_KEY"], api_secret: ENV["CLOUDINARY_SECRET"], multiple: true)
+    .form-group.direct-upload
+      = label_tag :file, "Photos:"
+      - @hosting.images.each do |image|
+        = image_tag image.url, alt: 'thumbnail image', class: 'img-upload-thumb'
+      = file_field_tag :file, data: { 'form-data': (@s3_direct_post.fields), url: @s3_direct_post.url, host: URI.parse(@s3_direct_post.url).host, 'field-name': 'images[][url]' }
 
   = f.submit "Save", class: 'btn btn-success btn-block btn-lg'
+
+  :javascript
+    // S3 file uploads
+    $('.direct-upload').find('input:file').each(function(i, elem) {
+      var fileInput    = $(elem);
+      var form         = $(fileInput.parents('form:first'));
+      var submitButton = form.find('input[type="submit"]');
+      var progressBar  = $('<div class="bar"></div>');
+      var barContainer = $('<div class="progress"></div>').append(progressBar);
+      fileInput.after(barContainer);
+
+      fileInput.fileupload({
+        fileInput:        fileInput,
+        url:              fileInput.data('url'),
+        type:             'POST',
+        autoUpload:       true,
+        formData:         fileInput.data('form-data'),
+        paramName:        'file', // S3 does not like nested name fields i.e. name="user[avatar_url]"
+        dataType:         'XML',  // S3 returns XML if success_action_status is set to 201
+        replaceFileInput: false,
+        progressall: function (e, data) {
+          var progress = parseInt(data.loaded / data.total * 100, 10);
+          progressBar.css('width', progress + '%')
+        },
+        start: function (e) {
+          submitButton.prop('disabled', true);
+
+          progressBar.
+            css('background', 'green').
+            css('display', 'block').
+            css('width', '0%').
+            text("Loading...");
+        },
+        done: function(e, data) {
+          submitButton.prop('disabled', false);
+          progressBar.text('Uploading done');
+
+          // extract key and generate URL from response
+          var key   = $(data.jqXHR.responseXML).find('Key').text();
+          var url   = '//' + data.host + '/' + key;
+
+          // create hidden field
+          var input = $('<input />', { type:'hidden', name: fileInput.data('field-name'), value: url })
+          form.append(input);
+
+          // empty out the dummy input
+          fileInput[0].value = ''
+
+          // create thumbnail image
+          fileInput.before('<img src="' + url + '" class="img-upload-thumb" alt="thumbnail image">')
+        },
+        fail: function(e, data) {
+          submitButton.prop('disabled', false);
+
+          progressBar.
+            css('background', 'red').
+            text('Failed');
+        }
+      });
+    });

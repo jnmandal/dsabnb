@@ -24,7 +24,9 @@ gem 'omniauth-facebook'
 gem 'omniauth-google-oauth2'
 gem 'omniauth-twitter'
 
-gem 'cloudinary'
+gem 'aws-sdk'
+gem 'jquery-fileupload-rails'
+
 gem 'geocoder'
 gem 'validates_zipcode'
 gem 'figaro'
