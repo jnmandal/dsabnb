@@ -14,6 +14,7 @@ class Hosting < ActiveRecord::Base
 
   belongs_to :host, class_name: "User", foreign_key: :host_id
   has_many :contacts
+  has_many :images, as: :imageable
 
   after_validation :geocode, :if => lambda{ |obj| obj.zipcode_changed? }
 

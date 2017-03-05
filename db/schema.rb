@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20161015182226) do
+ActiveRecord::Schema.define(version: 20170305022412) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -45,6 +45,16 @@ ActiveRecord::Schema.define(version: 20161015182226) do
   end
 
   add_index "hostings", ["host_id"], name: "index_hostings_on_host_id", using: :btree
+
+  create_table "images", force: :cascade do |t|
+    t.string   "url"
+    t.integer  "imageable_id"
+    t.string   "imageable_type"
+    t.datetime "created_at",     null: false
+    t.datetime "updated_at",     null: false
+  end
+
+  add_index "images", ["imageable_type", "imageable_id"], name: "index_images_on_imageable_type_and_imageable_id", using: :btree
 
   create_table "users", force: :cascade do |t|
     t.string   "email"
